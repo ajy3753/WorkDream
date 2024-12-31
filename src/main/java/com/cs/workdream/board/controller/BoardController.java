@@ -33,37 +33,37 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
-    // 커뮤니티 홈 페이지 표시
+    // 而ㅻ�ㅻ땲�떚 �솃 �럹�씠吏� �몴�떆
     @GetMapping("/communityHome")
     public String showCommunityHome() {
         return "board/communityHome"; // communityHome.jsp
     }
 
-    // 게시글 작성 페이지 표시
+    // 寃뚯떆湲� �옉�꽦 �럹�씠吏� �몴�떆ㅊㅌㅍㅎㅍㅌㅀㅍㄴㅌㄿ
     @GetMapping("/communityPost")
     public String showCommunityPost() {
         return "board/communityPost"; // communityPost.jsp
     }
 
-    // 게시글 보기 페이지 표시
+    // 寃뚯떆湲� 蹂닿린 �럹�씠吏� �몴�ㅇㄴㄹㄴㅇㄹㅇ떆
     @GetMapping("/communityView")
     public String showCommunityView(@RequestParam("postId") int postId, Model model, HttpSession session) {
-        // 게시글 조회 (직무 카테고리 포함)
+        // 寃뚯떆湲� 議고쉶 (吏곷Т 移댄뀒怨좊━ �룷�븿)
         Board post = boardService.getPostWithJobCategories(postId);
-        if(post != null && "Y".equals(post.getStatus())) { // getStatus() 메서드 존재 확인
-            // 조회수 증가
+        if(post != null && "Y".equals(post.getStatus())) { // getStatus() 硫붿꽌�뱶 議댁옱 �솗�씤
+            // 議고쉶�닔 利앷�
             boardService.increaseViewCount(postId);
 
-            // 모델에 게시글 추가
+            // 紐⑤뜽�뿉 寃뚯떆湲� 異붽�
             model.addAttribute("post", post);
 
-            // 현재 사용자 정보 (로그인 사용자 정보)
+            // �쁽�옱 �궗�슜�옄 �젙蹂� (濡쒓렇�씤 �궗�슜�옄 �젙蹂�)
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser != null) {
                 model.addAttribute("currentUser", currentUser);
 
-                // 사용자가 이 게시글에 공감했는지 여부 판단 로직 추가 가능
-                boolean userLikedPost = false; // 실제 공감 여부 판단 로직 구현 필요
+                // �궗�슜�옄媛� �씠 寃뚯떆湲��뿉 怨듦컧�뻽�뒗吏� �뿬遺� �뙋�떒 濡쒖쭅 異붽� 媛��뒫
+                boolean userLikedPost = false; // �떎�젣 怨듦컧 �뿬遺� �뙋�떒 濡쒖쭅 援ы쁽 �븘�슂
                 model.addAttribute("userLikedPost", userLikedPost);
             } else {
                 model.addAttribute("userLikedPost", false);
@@ -71,71 +71,71 @@ public class BoardController {
 
             return "board/communityView"; // communityView.jsp
         } else {
-            model.addAttribute("errorMsg", "게시글을 찾을 수 없습니다.");
-            return "common/errorPage"; // 에러 페이지
+            model.addAttribute("errorMsg", "寃뚯떆湲��쓣 李얠쓣 �닔 �뾾�뒿�땲�떎.");
+            return "common/errorPage"; // �뿉�윭 �럹�씠吏�
         }
     }
     
-    // 게시글 수정 페이지 표시
+    // 寃뚯떆湲� �닔�젙 �럹�씠吏� �몴�떆
     @GetMapping("/editPost")
     public String showEditPost(@RequestParam("postId") int postId, Model model, HttpSession session) {
-        // 게시글 조회
+        // 寃뚯떆湲� 議고쉶
         Board post = boardService.getPostWithJobCategories(postId);
         if(post != null && "Y".equals(post.getStatus())) {
-            // 현재 사용자 정보
+            // �쁽�옱 �궗�슜�옄 �젙蹂ㅌㅊㅌㅋㅊ�
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser != null && post.getUserNo() == currentUser.getUserNo()) {
                 model.addAttribute("post", post);
                 return "board/editPost"; // editPost.jsp
             } else {
-                model.addAttribute("errorMsg", "게시글을 수정할 권한이 없습니다.");
+                model.addAttribute("errorMsg", "寃뚯떆湲��쓣 �닔�젙�븷 沅뚰븳�씠 �뾾�뒿�땲�떎.");
                 return "common/errorPage";
             }
         } else {
-            model.addAttribute("errorMsg", "게시글을 찾을 수 없습니다.");
-            return "common/errorPage"; // 에러 페이지
+            model.addAttribute("errorMsg", "寃뚯떆湲��쓣 李얠쓣 �닔 �뾾�뒿�땲�떎.");
+            return "common/errorPage"; // �뿉�윭 �럹�씠吏�
         }
     }
 
-    // 커뮤니티 게시판 목록 페이지 표시
+    // 而ㅻ�ㅻ땲�떚 寃뚯떆�뙋 紐⑸줉 �럹�씠吏� �몴�떆
     @GetMapping("/communityList")
-    public String showCommunityList(@RequestParam(value="category", defaultValue="전체글") String category, Model model) {
+    public String showCommunityList(@RequestParam(value="category", defaultValue="�쟾泥닿�") String category, Model model) {
         model.addAttribute("category", category);
         return "board/communityList"; // communityList.jsp
     }
 
-    // 임시 로그인 엔드포인트 (개발용)
+    // �엫�떆 濡쒓렇�씤 �뿏�뱶�룷�씤�듃 (媛쒕컻�슜)
     @GetMapping("/testLogin")
     public String testLogin(HttpSession session) {
         Member mockUser = new Member();
-        mockUser.setUserNo(1); // 실제 사용자 번호로 변경
-        mockUser.setUserId("testuser123"); // userId 설정
-        // 필요한 다른 필드도 설정
+        mockUser.setUserNo(1); // �떎�젣 �궗�슜�옄 踰덊샇濡� 蹂�寃�
+        mockUser.setUserId("testuser123"); // userId �꽕�젙
+        // �븘�슂�븳 �떎瑜� �븘�뱶�룄 �꽕�젙
         session.setAttribute("loginUser", mockUser);
-        return "redirect:/resume/enrollresume"; // 로그인 후 리다이렉트할 페이지
+        return "redirect:/resume/enrollresume"; // 濡쒓렇�씤 �썑 由щ떎�씠�젆�듃�븷 �럹�씠吏�
     }
     
-    // 채용공고목록 맵핑
+    // 梨꾩슜怨듦퀬紐⑸줉 留듯븨
     @GetMapping("/listOfJobOpening")
     public String showJobOpeningList() {
         return "board/listOfJobOpening"; // listOfJobOpening.jsp
     }
     
     // -------------------
-    // REST API 관련 메서드
+    // REST API 愿��젴 硫붿꽌�뱶
     // -------------------
 
-    // 게시글 수 조회 (REST API)
+    // 寃뚯떆湲� �닔 議고쉶 (REST API)
     @GetMapping("/api/postCount")
     @ResponseBody
     public Map<String, Object> getPostCount() {
-        int count = boardService.countPosts("전체글");
+        int count = boardService.countPosts("�쟾泥닿�");
         Map<String, Object> response = new HashMap<>();
         response.put("count", count);
         return response;
     }
 
-    // 인기 게시글 조회 (REST API)
+    // �씤湲� 寃뚯떆湲� 議고쉶 (REST API)
     @GetMapping("/api/popularPosts")
     @ResponseBody
     public Map<String, Object> getPopularPosts() {
@@ -145,12 +145,12 @@ public class BoardController {
         return response;
     }
 
-    // 카테고리 및 필터에 따른 게시글 조회 (REST API)
+    // 移댄뀒怨좊━ 諛� �븘�꽣�뿉 �뵲瑜� 寃뚯떆湲� 議고쉶 (REST API)
     @GetMapping("/api/posts")
     @ResponseBody
     public Map<String, Object> getPosts(
-            @RequestParam(value="category", defaultValue="전체글") String category,
-            @RequestParam(value="filter", defaultValue="최신순") String filter,
+            @RequestParam(value="category", defaultValue="�쟾泥닿�") String category,
+            @RequestParam(value="filter", defaultValue="理쒖떊�닚") String filter,
             @RequestParam(value="jobFilter", required=false) String jobFilter,
             @RequestParam(value="offset", defaultValue="0") int offset,
             @RequestParam(value="limit", defaultValue="10") int limit) {
@@ -164,7 +164,7 @@ public class BoardController {
         return response;
     }
 
-    // 새로운 게시글 생성 (REST API)
+    // �깉濡쒖슫 寃뚯떆湲� �깮�꽦 (REST API)
     @PostMapping("/api/posts")
     @ResponseBody
     public Map<String, Object> createPost(
@@ -178,36 +178,36 @@ public class BoardController {
         
         Map<String, Object> response = new HashMap<>();
         try {
-            // 현재 로그인한 사용자 정보 가져오기
+            // �쁽�옱 濡쒓렇�씤�븳 �궗�슜�옄 �젙蹂� 媛��졇�삤湲�
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser == null) {
                 response.put("status", "fail");
-                response.put("message", "로그인이 필요합니다.");
+                response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
                 return response;
             }
             int userNo = currentUser.getUserNo();
-            String author = currentUser.getUserId(); // 필요에 따라 변경
+            String author = currentUser.getUserId(); // �븘�슂�뿉 �뵲�씪 蹂�寃�
 
-            // 이미지 업로드 처리
+            // �씠誘몄� �뾽濡쒕뱶 泥섎━
             String imagePath = null;
             if(image != null && !image.isEmpty()) {
-                // 고정된 업로드 디렉토리 설정
+                // 怨좎젙�맂 �뾽濡쒕뱶 �뵒�젆�넗由� �꽕�젙
                 String uploadDir = "C:/uploads/";
                 File dir = new File(uploadDir);
                 if (!dir.exists()) {
-                    dir.mkdirs(); // 디렉토리 생성
+                    dir.mkdirs(); // �뵒�젆�넗由� �깮�꽦
                 }
                 String originalFilename = image.getOriginalFilename();
                 String uniqueFilename = System.currentTimeMillis() + "_" + originalFilename;
                 File dest = new File(dir, uniqueFilename);
                 image.transferTo(dest);
-                imagePath = uniqueFilename; // 이미지 파일명만 저장
+                imagePath = uniqueFilename; // �씠誘몄� �뙆�씪紐낅쭔 ���옣
 
-                // 업로드 경로 로그 출력
+                // �뾽濡쒕뱶 寃쎈줈 濡쒓렇 異쒕젰
                 System.out.println("Image uploaded to: " + dest.getAbsolutePath());
             }
 
-            // Board 객체 생성
+            // Board 媛앹껜 �깮�꽦
             Board board = new Board();
             board.setCategory(category);
             board.setTitle(title);
@@ -220,77 +220,77 @@ public class BoardController {
             board.setLikeCount(0);
             board.setHashtags(hashtags);
             board.setJobCategories(jobs);
-            board.setStatus("Y"); // 게시글 상태 설정
+            board.setStatus("Y"); // 寃뚯떆湲� �긽�깭 �꽕�젙
 
-            // 게시글 삽입
+            // 寃뚯떆湲� �궫�엯
             int result = boardService.createPost(board);
             if(result > 0) {
                 response.put("status", "success");
                 response.put("postId", board.getPostingNo());
             } else {
                 response.put("status", "fail");
-                response.put("message", "게시글 등록에 실패했습니다.");
+                response.put("message", "寃뚯떆湲� �벑濡앹뿉 �떎�뙣�뻽�뒿�땲�떎.");
             }
         } catch(IOException e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "이미지 업로드 중 오류가 발생했습니다: " + e.getMessage());
+            response.put("message", "�씠誘몄� �뾽濡쒕뱶 以� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎: " + e.getMessage());
         } catch(Exception e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+            response.put("message", "�꽌踰� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎: " + e.getMessage());
         }
 
         return response;
     }
 
-    // 게시글 삭제 API (REST API)
+    // 寃뚯떆湲� �궘�젣 API (REST API)
     @DeleteMapping("/api/posts/{postingNo}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> deletePost(
             @PathVariable("postingNo") int postingNo,
-            HttpSession session) { // 세션을 통해 사용자 정보 가져오기
+            HttpSession session) { // �꽭�뀡�쓣 �넻�빐 �궗�슜�옄 �젙蹂� 媛��졇�삤湲�
 
         Map<String, Object> response = new HashMap<>();
 
-        // 현재 사용자 정보 가져오기 (세션을 통해)
+        // �쁽�옱 �궗�슜�옄 �젙蹂� 媛��졇�삤湲� (�꽭�뀡�쓣 �넻�빐)
         Member currentUser = (Member) session.getAttribute("loginUser");
         if(currentUser == null) {
             response.put("status", "fail");
-            response.put("message", "로그인이 필요합니다.");
+            response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
         int currentUserNo = currentUser.getUserNo();
 
-        // 게시글 정보 조회
+        // 寃뚯떆湲� �젙蹂� 議고쉶
         Board post = boardService.getPost(postingNo);
         if (post == null || !"Y".equals(post.getStatus())) {
             response.put("status", "fail");
-            response.put("message", "게시글을 찾을 수 없습니다.");
+            response.put("message", "寃뚯떆湲��쓣 李얠쓣 �닔 �뾾�뒿�땲�떎.");
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
 
-        // 작성자 확인
+        // �옉�꽦�옄 �솗�씤
         if (post.getUserNo() != currentUserNo) {
             response.put("status", "fail");
-            response.put("message", "본인의 게시글만 삭제할 수 있습니다.");
+            response.put("message", "蹂몄씤�쓽 寃뚯떆湲�留� �궘�젣�븷 �닔 �엳�뒿�땲�떎.");
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
 
-        // 게시글 삭제
+        // 寃뚯떆湲� �궘�젣
         int result = boardService.deletePost(postingNo);
         if (result > 0) {
             response.put("status", "success");
-            response.put("message", "게시글이 삭제되었습니다.");
+            response.put("message", "寃뚯떆湲��씠 �궘�젣�릺�뿀�뒿�땲�떎.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             response.put("status", "fail");
-            response.put("message", "게시글 삭제에 실패했습니다.");
+            response.put("message", "寃뚯떆湲� �궘�젣�뿉 �떎�뙣�뻽�뒿�땲�떎.");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // 게시글 조회 API (REST API)
+    // 寃뚯떆湲� 議고쉶 API (REST API)
     @GetMapping("/api/posts/{postingNo}")
     @ResponseBody
     public ResponseEntity<Board> getPost(@PathVariable("postingNo") int postingNo) {
@@ -298,12 +298,12 @@ public class BoardController {
         if (post == null || !"Y".equals(post.getStatus())) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        // 조회수 증가
+        // 議고쉶�닔 利앷�
         boardService.increaseViewCount(postingNo);
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
-    // 게시글 수정 API (REST API)
+    // 寃뚯떆湲� �닔�젙 API (REST API)
     @PostMapping("/api/posts/{postingNo}/update")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updatePost(
@@ -319,46 +319,46 @@ public class BoardController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // 현재 사용자 정보 가져오기 (로그인 사용자 정보)
+            // �쁽�옱 �궗�슜�옄 �젙蹂� 媛��졇�삤湲� (濡쒓렇�씤 �궗�슜�옄 �젙蹂�)
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser == null) {
                 response.put("status", "fail");
-                response.put("message", "로그인이 필요합니다.");
+                response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
                 return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
             }
             int userNo = currentUser.getUserNo();
 
-            // 게시글 정보 조회
+            // 寃뚯떆湲� �젙蹂� 議고쉶
             Board existingPost = boardService.getPostWithJobCategories(postingNo);
             if(existingPost == null || !"Y".equals(existingPost.getStatus())) {
                 response.put("status", "fail");
-                response.put("message", "게시글을 찾을 수 없습니다.");
+                response.put("message", "寃뚯떆湲��쓣 李얠쓣 �닔 �뾾�뒿�땲�떎.");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
 
-            // 작성자 확인
+            // �옉�꽦�옄 �솗�씤
             if(existingPost.getUserNo() != userNo) {
                 response.put("status", "fail");
-                response.put("message", "본인의 게시글만 수정할 수 있습니다.");
+                response.put("message", "蹂몄씤�쓽 寃뚯떆湲�留� �닔�젙�븷 �닔 �엳�뒿�땲�떎.");
                 return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
             }
 
-            // 이미지 업로드 처리 (기존 이미지 유지 또는 새로운 이미지로 대체)
-            String imagePath = existingPost.getImagePath(); // 기존 이미지 경로 유지
+            // �씠誘몄� �뾽濡쒕뱶 泥섎━ (湲곗〈 �씠誘몄� �쑀吏� �삉�뒗 �깉濡쒖슫 �씠誘몄�濡� ��泥�)
+            String imagePath = existingPost.getImagePath(); // 湲곗〈 �씠誘몄� 寃쎈줈 �쑀吏�
             if(image != null && !image.isEmpty()) {
-                // 고정된 업로드 디렉토리 설정
+                // 怨좎젙�맂 �뾽濡쒕뱶 �뵒�젆�넗由� �꽕�젙
                 String uploadDir = "C:/uploads/";
                 File dir = new File(uploadDir);
                 if (!dir.exists()) {
-                    dir.mkdirs(); // 디렉토리 생성
+                    dir.mkdirs(); // �뵒�젆�넗由� �깮�꽦
                 }
                 String originalFilename = image.getOriginalFilename();
                 String uniqueFilename = System.currentTimeMillis() + "_" + originalFilename;
                 File dest = new File(dir, uniqueFilename);
                 image.transferTo(dest);
-                imagePath = uniqueFilename; // 이미지 파일명만 저장
+                imagePath = uniqueFilename; // �씠誘몄� �뙆�씪紐낅쭔 ���옣
 
-                // 기존 이미지 파일 삭제 (선택 사항)
+                // 湲곗〈 �씠誘몄� �뙆�씪 �궘�젣 (�꽑�깮 �궗�빆)
                 if(existingPost.getImagePath() != null) {
                     File oldImage = new File("C:/uploads/" + existingPost.getImagePath());
                     if(oldImage.exists()) {
@@ -367,11 +367,11 @@ public class BoardController {
                     }
                 }
 
-                // 업로드 경로 로그 출력
+                // �뾽濡쒕뱶 寃쎈줈 濡쒓렇 異쒕젰
                 System.out.println("Image updated to: " + dest.getAbsolutePath());
             }
 
-            // Board 객체 생성 및 업데이트할 필드 설정
+            // Board 媛앹껜 �깮�꽦 諛� �뾽�뜲�씠�듃�븷 �븘�뱶 �꽕�젙
             Board board = new Board();
             board.setPostingNo(postingNo);
             board.setCategory(category);
@@ -381,29 +381,29 @@ public class BoardController {
             board.setUserNo(userNo);
             board.setJobCategories(jobs);
             board.setHashtags(hashtags);
-            board.setStatus("Y"); // 상태 유지
+            board.setStatus("Y"); // �긽�깭 �쑀吏�
 
-            // 게시글 업데이트
+            // 寃뚯떆湲� �뾽�뜲�씠�듃
             int result = boardService.updatePost(board);
             if(result > 0) {
                 response.put("status", "success");
-                response.put("message", "게시글이 수정되었습니다.");
+                response.put("message", "寃뚯떆湲��씠 �닔�젙�릺�뿀�뒿�땲�떎.");
                 response.put("postId", postingNo);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 response.put("status", "fail");
-                response.put("message", "게시글 수정에 실패했습니다.");
+                response.put("message", "寃뚯떆湲� �닔�젙�뿉 �떎�뙣�뻽�뒿�땲�떎.");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
         } catch(IOException e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "이미지 업로드 중 오류가 발생했습니다: " + e.getMessage());
+            response.put("message", "�씠誘몄� �뾽濡쒕뱶 以� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch(Exception e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+            response.put("message", "�꽌踰� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -414,130 +414,130 @@ public class BoardController {
     public Map<String, Object> likePost(@PathVariable("postingNo") int postingNo, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 로그인 여부 확인
+            // 濡쒓렇�씤 �뿬遺� �솗�씤
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser == null) {
                 response.put("status", "fail");
-                response.put("message", "로그인이 필요합니다.");
+                response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
                 return response;
             }
 
-            // 공감 로직
+            // 怨듦컧 濡쒖쭅
             boolean success = boardService.likePost(postingNo, currentUser.getUserNo());
 
             if(success) {
                 response.put("status", "success");
-                response.put("message", "공감했습니다.");
+                response.put("message", "怨듦컧�뻽�뒿�땲�떎.");
             } else {
                 response.put("status", "fail");
-                response.put("message", "이미 공감했거나, 공감에 실패했습니다.");
+                response.put("message", "�씠誘� 怨듦컧�뻽嫄곕굹, 怨듦컧�뿉 �떎�뙣�뻽�뒿�땲�떎.");
             }
         } catch(Exception e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "서버 오류가 발생했습니다.");
+            response.put("message", "�꽌踰� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎.");
         }
         return response;
     }
 
-    /* 게시글 공감 취소 API */
+    /* 寃뚯떆湲� 怨듦컧 痍⑥냼 API */
     @PostMapping("/api/posts/{postingNo}/unlike")
     @ResponseBody
     public Map<String, Object> unlikePost(@PathVariable("postingNo") int postingNo, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 로그인 여부 확인
+            // 濡쒓렇�씤 �뿬遺� �솗�씤
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser == null) {
                 response.put("status", "fail");
-                response.put("message", "로그인이 필요합니다.");
+                response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
                 return response;
             }
 
-            // 공감 취소 로직
+            // 怨듦컧 痍⑥냼 濡쒖쭅
             boolean success = boardService.unlikePost(postingNo, currentUser.getUserNo());
 
             if(success) {
                 response.put("status", "success");
-                response.put("message", "공감을 취소했습니다.");
+                response.put("message", "怨듦컧�쓣 痍⑥냼�뻽�뒿�땲�떎.");
             } else {
                 response.put("status", "fail");
-                response.put("message", "공감을 하지 않았거나, 취소에 실패했습니다.");
+                response.put("message", "怨듦컧�쓣 �븯吏� �븡�븯嫄곕굹, 痍⑥냼�뿉 �떎�뙣�뻽�뒿�땲�떎.");
             }
         } catch(Exception e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "서버 오류가 발생했습니다.");
+            response.put("message", "�꽌踰� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎.");
         }
         return response;
     }
 
-    /* 댓글 공감 API */
+    /* �뙎湲� 怨듦컧 API */
     @PostMapping("/api/replies/{replyNo}/like")
     @ResponseBody
     public Map<String, Object> likeReply(@PathVariable("replyNo") int replyNo, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 로그인 여부 확인
+            // 濡쒓렇�씤 �뿬遺� �솗�씤
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser == null) {
                 response.put("status", "fail");
-                response.put("message", "로그인이 필요합니다.");
+                response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
                 return response;
             }
 
-            // 공감 로직
+            // 怨듦컧 濡쒖쭅
             boolean success = boardService.likeReply(replyNo, currentUser.getUserNo());
 
             if(success) {
                 response.put("status", "success");
-                response.put("message", "공감했습니다.");
+                response.put("message", "怨듦컧�뻽�뒿�땲�떎.");
             } else {
                 response.put("status", "fail");
-                response.put("message", "이미 공감했거나, 공감에 실패했습니다.");
+                response.put("message", "�씠誘� 怨듦컧�뻽嫄곕굹, 怨듦컧�뿉 �떎�뙣�뻽�뒿�땲�떎.");
             }
         } catch(Exception e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "서버 오류가 발생했습니다.");
+            response.put("message", "�꽌踰� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎.");
         }
         return response;
     }
 
-    /* 댓글 공감 취소 API */
+    /* �뙎湲� 怨듦컧 痍⑥냼 API */
     @PostMapping("/api/replies/{replyNo}/unlike")
     @ResponseBody
     public Map<String, Object> unlikeReply(@PathVariable("replyNo") int replyNo, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 로그인 여부 확인
+            // 濡쒓렇�씤 �뿬遺� �솗�씤
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser == null) {
                 response.put("status", "fail");
-                response.put("message", "로그인이 필요합니다.");
+                response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
                 return response;
             }
 
-            // 공감 취소 로직
+            // 怨듦컧 痍⑥냼 濡쒖쭅
             boolean success = boardService.unlikeReply(replyNo, currentUser.getUserNo());
 
             if(success) {
                 response.put("status", "success");
-                response.put("message", "공감을 취소했습니다.");
+                response.put("message", "怨듦컧�쓣 痍⑥냼�뻽�뒿�땲�떎.");
             } else {
                 response.put("status", "fail");
-                response.put("message", "공감을 하지 않았거나, 취소에 실패했습니다.");
+                response.put("message", "怨듦컧�쓣 �븯吏� �븡�븯嫄곕굹, 痍⑥냼�뿉 �떎�뙣�뻽�뒿�땲�떎.");
             }
         } catch(Exception e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "서버 오류가 발생했습니다.");
+            response.put("message", "�꽌踰� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎.");
         }
         return response;
     }
 
     
-    // 특정 게시글의 댓글 조회 (REST API)
+    // �듅�젙 寃뚯떆湲��쓽 �뙎湲� 議고쉶 (REST API)
     @GetMapping("/api/replies")
     @ResponseBody
     public Map<String, Object> getReplies(@RequestParam("postId") int postId) {
@@ -547,58 +547,58 @@ public class BoardController {
         return response;
     }
 
-    // 댓글 추가 (REST API)
+    // �뙎湲� 異붽� (REST API)
     @PostMapping("/api/replies")
     @ResponseBody
     public Map<String, Object> addReply(@RequestBody Reply reply, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 세션에서 현재 사용자 정보 가져오기
+            // �꽭�뀡�뿉�꽌 �쁽�옱 �궗�슜�옄 �젙蹂� 媛��졇�삤湲�
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser == null) {
                 response.put("status", "fail");
-                response.put("message", "로그인이 필요합니다.");
+                response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
                 return response;
             }
             int userNo = currentUser.getUserNo();
             reply.setUserNo(userNo);
-            // author 필드는 MyBatis selectReplies에서 JOIN을 통해 가져오기 때문에 서버에서 설정할 필요 없음
+            // author �븘�뱶�뒗 MyBatis selectReplies�뿉�꽌 JOIN�쓣 �넻�빐 媛��졇�삤湲� �븣臾몄뿉 �꽌踰꾩뿉�꽌 �꽕�젙�븷 �븘�슂 �뾾�쓬
 
             int result = boardService.addReply(reply);
             if(result > 0) {
                 response.put("status", "success");
             } else {
                 response.put("status", "fail");
-                response.put("message", "댓글 등록에 실패했습니다.");
+                response.put("message", "�뙎湲� �벑濡앹뿉 �떎�뙣�뻽�뒿�땲�떎.");
             }
             return response;
         } catch(Exception e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "서버 오류가 발생했습니다.");
+            response.put("message", "�꽌踰� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎.");
             return response;
         }
     }   
     
-    // 댓글 삭제 (REST API)
+    // �뙎湲� �궘�젣 (REST API)
     @DeleteMapping("/api/replies/{replyNo}")
     @ResponseBody
     public Map<String, Object> deleteReply(@PathVariable("replyNo") int replyNo, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 세션에서 현재 사용자 정보 가져오기
+            // �꽭�뀡�뿉�꽌 �쁽�옱 �궗�슜�옄 �젙蹂� 媛��졇�삤湲�
             Member currentUser = (Member) session.getAttribute("loginUser");
             if(currentUser == null) {
                 response.put("status", "fail");
-                response.put("message", "로그인이 필요합니다.");
+                response.put("message", "濡쒓렇�씤�씠 �븘�슂�빀�땲�떎.");
                 return response;
             }
 
-            // 댓글 소유자 확인
+            // �뙎湲� �냼�쑀�옄 �솗�씤
             Reply existingReply = boardService.getReplyById(replyNo);
             if(existingReply == null || existingReply.getUserNo() != currentUser.getUserNo()) {
                 response.put("status", "fail");
-                response.put("message", "권한이 없습니다.");
+                response.put("message", "沅뚰븳�씠 �뾾�뒿�땲�떎.");
                 return response;
             }
 
@@ -607,22 +607,22 @@ public class BoardController {
                 response.put("status", "success");
             } else {
                 response.put("status", "fail");
-                response.put("message", "댓글 삭제에 실패했습니다.");
+                response.put("message", "�뙎湲� �궘�젣�뿉 �떎�뙣�뻽�뒿�땲�떎.");
             }
         } catch(Exception e) {
             e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "서버 오류가 발생했습니다.");
+            response.put("message", "�꽌踰� �삤瑜섍� 諛쒖깮�뻽�뒿�땲�떎.");
         }
         return response;
     }
 
-    // 이미지 서빙을 위한 컨트롤러 메서드 추가
+    // �씠誘몄� �꽌鍮숈쓣 �쐞�븳 而⑦듃濡ㅻ윭 硫붿꽌�뱶 異붽�
     @GetMapping("/uploads/{filename}")
     @ResponseBody
     public ResponseEntity<byte[]> serveImage(@PathVariable("filename") String filename) {
         try {
-            // 고정된 업로드 디렉토리 설정
+            // 怨좎젙�맂 �뾽濡쒕뱶 �뵒�젆�넗由� �꽕�젙
             String uploadDir = "C:/uploads/";
             File imageFile = new File(uploadDir, filename);
             if (!imageFile.exists()) {
@@ -645,8 +645,8 @@ public class BoardController {
     }
     
     /**
-     * 제목으로 게시글 검색 (REST API)
-     * GET /board/api/searchPosts?title=검색어&offset=0&limit=10
+     * �젣紐⑹쑝濡� 寃뚯떆湲� 寃��깋 (REST API)
+     * GET /board/api/searchPosts?title=寃��깋�뼱&offset=0&limit=10
      */
     @GetMapping("/api/searchPosts")
     @ResponseBody
