@@ -16,7 +16,7 @@
 <c:import url="/WEB-INF/views/common/header.jsp" />
     <div class="home-container"> 
         <div class="title">
-            <h1>커뮤니티 홈</h1>
+            <h1>커뮤니티 홈.</h1>
         </div>
 
         <!-- 공지사항  -->
